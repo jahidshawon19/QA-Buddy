@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Developers</h2>
+  <a href="{% url 'dev_add' %}" class="btn btn-primary">Add Developer</a>
+</div>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Sl No</th>
+      <th>Name</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for dev in devs %}
+    <tr>
+      <td>{{ dev.sl_no }}</td>
+      <td>{{ dev.name }}</td>
+      <td>
+        <a href="{% url 'dev_edit' dev.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+        <a href="{% url 'dev_delete' dev.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="3" class="text-center">No developers found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
