@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>QA-BUDDY</title>
+    <title>Next Ventures-Master-Checklist </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   </head>
-  <body>
+  <body class="bg-light">
     <nav class="navbar navbar-expand-lg navbar-light"style="background-color: #e3f2fd;">
       <div class="container-fluid">
-        <a class="navbar-brand" href="{% url 'home' %}">QA-BUDDY(*Beta)</a>
+        <a class="navbar-brand" href="{% url 'home' %}">Next Ventures-Master-Checklist </a>
         <button
           class="navbar-toggler"
           type="button"
@@ -24,6 +24,7 @@
 
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link" href="{% url 'cover_page' %}">Cover</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'task_list' %}">Tasks</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'checklist_list' %}">Checklists</a></li>
             {% if user.is_staff %}
@@ -48,7 +49,7 @@
       </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container-fluid mt-4">
       {% if messages %}
         {% for message in messages %}
           <div class="alert alert-{{ message.tags }}">{{ message }}</div>

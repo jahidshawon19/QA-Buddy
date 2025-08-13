@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">Checklist Summary (Cover Page)</h2>
+
+    <!-- Filter Form -->
+    <form method="get" class="row g-2 mb-4">
+        <div class="col-md-4">
+            <select name="sprint" class="form-select">
+                <option value="">-- All Sprints --</option>
+                {% for sprint in sprints %}
+                    <option value="{{ sprint }}" {% if sprint|stringformat:"s" == selected_sprint %}selected{% endif %}>
+                        Sprint {{ sprint }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+        </div>
+        <div class="col-md-2">
+            <a href="{% url 'cover_page' %}" class="btn btn-secondary w-100">Reset</a>
+        </div>
+    </form>
+
+    <div class="col-lg-4">
+            <!-- Summary Tables -->
+    {% if sprint_summary %}
+        {% for sprint, data in sprint_summary.items %}
+            <h4 class="mt-4">Sprint {{ sprint }}</h4>
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>User</th>
+                        <th>Total No. Checklists</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                        <tr>
+                            <td>{{ row.user }}</td>
+                            <td>{{ row.total }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted">No checklist data found.</p>
+    {% endif %}
+    </div>
+</div>
+{% endblock %}

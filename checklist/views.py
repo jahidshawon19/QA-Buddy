@@ -10,6 +10,10 @@ from .models import Task, Checklist, ProductManager, Developer
 from .forms import TaskForm, ChecklistForm, UserCreateForm, ProductManagerForm, DeveloperForm
 from django.db.models import Q
 
+from django.shortcuts import render
+from django.db.models import Count
+
+
 # from django.contrib.auth.views import LoginView
 # from django.contrib import messages
 
@@ -110,6 +114,11 @@ class ChecklistDeleteView(LoginRequiredMixin, DeleteView):
     template_name = 'checklist/confirm_delete.html'
     success_url = reverse_lazy('checklist_list')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['verbose_name'] = self.model._meta.verbose_name
+        return context    
+
 
 # ------------------------------------
 # Product Manager CRUD Views - staff only
@@ -204,3 +213,42 @@ class UserDeleteView(StaffRequiredMixin, DeleteView):
 #     def form_valid(self, form):
 #         messages.success(self.request, "Assalamulaikum")
 #         return super().form_valid(form)
+
+
+def cover_page(request):
+    selected_sprint = request.GET.get("sprint", "")
+
+    # Get all sprints from Task table (or Sprint model if you have one)
+    sprints = Task.objects.values_list("sprint_no", flat=True).distinct().order_by("sprint_no")
+
+    # Filter checklists by selected sprint
+    checklists = Checklist.objects.all()
+    if selected_sprint:
+        checklists = checklists.filter(task__sprint_no=selected_sprint)
+
+    # Group by sprint and created_by user
+    grouped_data = (
+        checklists
+        .values("task__sprint_no", "created_by__username")
+        .annotate(total_checklists=Count("sl_no"))
+        .order_by("task__sprint_no", "created_by__username")
+    )
+
+    # Organize data into nested dict { sprint_no: [ {user, total}, ... ] }
+    sprint_summary = {}
+    for item in grouped_data:
+        sprint_no = item["task__sprint_no"]
+        username = item["created_by__username"]
+        total = item["total_checklists"]
+
+        if sprint_no not in sprint_summary:
+            sprint_summary[sprint_no] = []
+        sprint_summary[sprint_no].append({"user": username, "total": total})
+
+    context = {
+        "sprints": sprints,
+        "selected_sprint": selected_sprint,
+        "sprint_summary": sprint_summary
+    }
+    return render(request, "checklist/cover_page.html", context)
+    

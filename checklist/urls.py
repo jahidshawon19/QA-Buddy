@@ -34,4 +34,6 @@ urlpatterns = [
 
     # Home redirect - show Checklist list
     path('', views.ChecklistListView.as_view(), name='home'),
+
+     path("cover/", views.cover_page, name="cover_page"),
 ]
