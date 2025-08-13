@@ -1,99 +1,133 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="container mt-4">
+    <!-- Page Title -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-primary">
+            📝 All Checklists
+        </h2>
+        <p class="text-muted">Manage and review all checklist items</p>
+    </div>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h3>Checklist</h3>
-  <a href="{% url 'checklist_add' %}" class="btn btn-primary">Add Checklist</a>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>Checklist</h3>
+            <a href="{% url 'checklist_add' %}" class="btn btn-primary">Add Checklist</a>
+        </div>
+
+
+    <!-- Filter/Search Bar -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Search by Task/Test Area</label>
+                    <input type="text" name="search" value="{{ request.GET.search }}" 
+                           class="form-control shadow-sm" placeholder="Enter keyword">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Filter by Sprint</label>
+                    <select name="sprint" class="form-select shadow-sm">
+                        <option value="">-- All Sprints --</option>
+                        {% for sprint in sprints %}
+                            <option value="{{ sprint }}" {% if sprint|stringformat:"s" == request.GET.sprint %}selected{% endif %}>
+                                Sprint {{ sprint }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100 shadow-sm">
+                        Filter
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <a href="{% url 'checklist_list' %}" class="btn btn-secondary w-100 shadow-sm">
+                        Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Checklist Table -->
+    <div class="card shadow-lg border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered align-middle mb-0">
+                    <thead class="table-dark text-center">
+                        <tr>
+                            <th>SL.</th>
+                            <th>Task</th>
+                            <th>Test Area</th>
+                            <th>Test Scenario</th>
+                            <th>Approved By PM</th>
+                            <th>Approved By Dev</th>
+                            <th>Status</th>
+                            <th>Retest</th>
+                            <th>Actual Evidence</th>
+                            <th>Sprint</th>
+                            <th>Bug Link</th>
+                            <th>Remarks</th>
+   
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for checklist in checklists %}
+                        <tr>
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td>{{ checklist.task.task_name }}</td>
+                            <td>{{ checklist.test_area }}</td>
+                            <td>{{ checklist.test_scenario }}</td>
+                            <td>{{ checklist.approved_by_PM.name|default:"N/A" }}</td>
+                            <td>{{ checklist.approved_by_dev.name|default:"N/A" }}</td>
+                            <td>
+                                <span class="badge {% if checklist.status == 'Pass' %}bg-success{% elif checklist.status == 'Fail' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                    {{ checklist.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge {% if checklist.retest_status == 'Pass' %}bg-success{% elif checklist.retest_status == 'Fail' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                    {{ checklist.retest_status }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if checklist.actual_evidence %}
+                                    <a href="{{ checklist.actual_evidence }}" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+                                {% else %}
+                                    <span class="text-muted">No Link</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">{{ checklist.task.sprint_no }}</td>
+                            <td>
+                                {% if checklist.bug_link %}
+                                    <a href="{{ checklist.bug_link }}" target="_blank" class="btn btn-sm btn-outline-danger">Bug</a>
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                     
+                            <td>{{ checklist.remarks }}</td>
+             
+                            <td class="text-center">
+                                <a href="{% url 'checklist_edit' checklist.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                                <a href="{% url 'checklist_delete' checklist.pk %}" 
+                                   class="btn btn-sm btn-danger" 
+                                   onclick="return confirm('Are you sure you want to delete this checklist?');">
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="14" class="text-center text-muted">No checklists found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
-<div class="container mt-3">
-    <form method="get" class="row g-2 align-items-center mb-3">
-        <!-- Sprint Filter -->
-        <div class="col-md-4">
-            <select name="sprint" class="form-select">
-                <option value="">-- All Sprints --</option>
-                {% for sprint in sprints %}
-                    <option value="{{ sprint }}" {% if sprint|stringformat:"s" == selected_sprint %}selected{% endif %}>
-                        Sprint {{ sprint }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <!-- Search -->
-        <div class="col-md-4">
-            <input type="text" name="search" class="form-control" placeholder="Search by task name"
-                   value="{{ search_query }}">
-        </div>
-
-        <!-- Submit -->
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-primary w-100">Filter</button>
-        </div>
-
-        <!-- Reset -->
-        <div class="col-md-2">
-            <a href="{% url 'checklist_list' %}" class="btn btn-secondary w-100">Reset</a>
-        </div>
-    </form>
-</div>
-
-
-<table class="table table-bordered">
-  <thead class="table-dark">
-    <tr>
-      <th>SL.</th>
-      <th>Task</th>
-      <th>Test Area</th>
-      <th>Test Scenario</th>           
-      <th>Approved By PM</th>          
-      <th>Approved By Dev</th>                   
-      <th>Status</th>
-      <th>Retest</th>
-      <th>Actual Evidence</th>
-      <th>Sprint</th>
-      <th>Remarks</th>  
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for checklist in checklists %}
-    <tr>
-      <td>{{ checklist.sl_no }}</td>
-      <td>{{ checklist.task.task_name }}</td>
-      <td>{{ checklist.test_area }}</td>
-      <td>{{ checklist.test_scenario|linebreaksbr }}</td>
-    {% if checklist.approved_by_PM.name  %}
-      <td>{{ checklist.approved_by_PM.name }}</td>
-    {% else %}
-      <td>N/A</td>
-    {% endif %}
-
-    {% if checklist.approved_by_dev.name %}
-      <td>{{ checklist.approved_by_dev.name}}</td>
-    {% else %}
-      <td>N/A</td>
-    {% endif %}
-
-
-  
-      <td>{{ checklist.status }}</td>
-      <td>{{ checklist.retest_status }}</td>
-      <td>{{ checklist.actual_evidence }}</td>
-      <td>{{ checklist.sprint }}</td>
-    {% if checklist.remarks %}
-      <td>{{ checklist.remarks|linebreaksbr }}</td> >
-    {% else %}
-      <td>N/A</td>
-    {% endif %}
-      <td>
-        <a href="{% url 'checklist_edit' checklist.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
-        <a href="{% url 'checklist_delete' checklist.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
-      </td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="7" class="text-center">No checklists found.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
 {% endblock %}

@@ -5,7 +5,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
-
+from django.contrib.auth.decorators import login_required
 from .models import Task, Checklist, ProductManager, Developer
 from .forms import TaskForm, ChecklistForm, UserCreateForm, ProductManagerForm, DeveloperForm
 from django.db.models import Q
@@ -59,13 +59,45 @@ class TaskDeleteView(LoginRequiredMixin, DeleteView):
 # ------------------------------------
 # Checklist Views - accessible by all logged-in users
 # ------------------------------------
+# class ChecklistListView(LoginRequiredMixin, ListView):
+#     model = Checklist
+#     template_name = 'checklist/checklist_list.html'
+#     context_object_name = 'checklists'
+    
+#     def get_queryset(self):
+#         queryset = super().get_queryset()
+#         sprint = self.request.GET.get('sprint')
+#         search = self.request.GET.get('search')
+
+#         if sprint:
+#             queryset = queryset.filter(task__sprint_no=sprint)
+#         if search:
+#             queryset = queryset.filter(task__task_name__icontains=search)
+#         return queryset
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['sprints'] = Task.objects.values_list('sprint_no', flat=True).distinct()
+#         return context
+
+
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView
+from .models import Checklist, Task
+
 class ChecklistListView(LoginRequiredMixin, ListView):
     model = Checklist
     template_name = 'checklist/checklist_list.html'
     context_object_name = 'checklists'
-    
+
     def get_queryset(self):
         queryset = super().get_queryset()
+
+        # Restrict normal users to only their own checklists
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(created_by=self.request.user)
+
         sprint = self.request.GET.get('sprint')
         search = self.request.GET.get('search')
 
@@ -73,12 +105,16 @@ class ChecklistListView(LoginRequiredMixin, ListView):
             queryset = queryset.filter(task__sprint_no=sprint)
         if search:
             queryset = queryset.filter(task__task_name__icontains=search)
+
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['sprints'] = Task.objects.values_list('sprint_no', flat=True).distinct()
+        context['sprints'] = Task.objects.values_list('sprint_no', flat=True).distinct().order_by('sprint_no')
+        context['selected_sprint'] = self.request.GET.get('sprint', '')
+        context['search_query'] = self.request.GET.get('search', '')
         return context
+
 
 class ChecklistCreateView(LoginRequiredMixin, CreateView):
     model = Checklist
@@ -214,7 +250,7 @@ class UserDeleteView(StaffRequiredMixin, DeleteView):
 #         messages.success(self.request, "Assalamulaikum")
 #         return super().form_valid(form)
 
-
+@login_required
 def cover_page(request):
     selected_sprint = request.GET.get("sprint", "")
 
