@@ -18,13 +18,14 @@ class Developer(models.Model):
 class Task(models.Model):
     sl_no = models.AutoField(primary_key=True)
     task_name = models.CharField(max_length=255)
+    task_link= models.URLField(max_length=500, blank=True, null=True)
     sprint_no = models.IntegerField()
 
     def __str__(self):
         return f"{self.task_name} (Sprint {self.sprint_no})"
     
     def __str__(self):
-        return str(self.sprint_no)
+        return str(self.task_name)
 
 class Checklist(models.Model):
     STATUS_CHOICES = [

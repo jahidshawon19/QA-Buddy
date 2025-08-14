@@ -33,7 +33,7 @@ urlpatterns = [
     path('users/<int:pk>/delete/', views.UserDeleteView.as_view(), name='user_delete'),
 
     # Home redirect - show Checklist list
-    path('', views.ChecklistListView.as_view(), name='home'),
+    # path('', views.ChecklistListView.as_view(), name='home'),
 
-     path("cover/", views.cover_page, name="cover_page"),
+     path('', views.cover_page, name="cover_page"),
 ]

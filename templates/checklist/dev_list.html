@@ -16,7 +16,7 @@
   <tbody>
     {% for dev in devs %}
     <tr>
-      <td>{{ dev.sl_no }}</td>
+      <td>{{ forloop.counter}}</td>
       <td>{{ dev.name }}</td>
       <td>
         <a href="{% url 'dev_edit' dev.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>

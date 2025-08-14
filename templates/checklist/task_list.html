@@ -10,6 +10,7 @@
     <tr>
       <th>Sl No</th>
       <th>Task Name</th>
+      <th>Task Details</th>
       <th>Sprint No</th>
       <th>Actions</th>
     </tr>
@@ -17,8 +18,11 @@
   <tbody>
     {% for task in tasks %}
     <tr>
-      <td>{{ task.sl_no }}</td>
+      <td>{{ forloop.counter}}</td>
       <td>{{ task.task_name }}</td>
+      <td>  <a href="{{task.task_link}}" target="_blank" class="btn btn-sm btn-outline-primary">View</a></td>
+
+      
       <td>{{ task.sprint_no }}</td>
       <td>
         <a href="{% url 'task_edit' task.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>

@@ -16,7 +16,7 @@
   <tbody>
     {% for pm in pms %}
     <tr>
-      <td>{{ pm.sl_no }}</td>
+      <td>{{ forloop.counter}}</td>
       <td>{{ pm.name }}</td>
       <td>
         <a href="{% url 'pm_edit' pm.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>

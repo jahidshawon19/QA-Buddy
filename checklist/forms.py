@@ -15,7 +15,13 @@ class DeveloperForm(forms.ModelForm):
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['task_name', 'sprint_no']
+        fields = ['task_name', 'task_link', 'sprint_no']
+        widgets = {
+            'task_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'task_link': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'Enter task link'}),
+            'sprint_no': forms.NumberInput(attrs={'class': 'form-control'}),
+
+        }
 
 
 class ChecklistForm(forms.ModelForm):
