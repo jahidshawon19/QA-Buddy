@@ -1,31 +1,50 @@
 {% extends 'base.html' %}
-{% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h2>Product Managers</h2>
-  <a href="{% url 'pm_add' %}" class="btn btn-primary">Add Product Manager</a>
-</div>
 
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Sl No</th>
-      <th>Name</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for pm in pms %}
-    <tr>
-      <td>{{ forloop.counter}}</td>
-      <td>{{ pm.name }}</td>
-      <td>
-        <a href="{% url 'pm_edit' pm.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
-        <a href="{% url 'pm_delete' pm.pk %}" class="btn btn-sm btn-outline-danger">Delete</a>
-      </td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="3" class="text-center">No product managers found.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
+{% block content %}
+<div class="container mt-4">
+    <!-- Header and Add Button -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">Product Managers</h2>
+        <a href="{% url 'pm_add' %}" class="btn btn-success shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Add Product Manager
+        </a>
+    </div>
+
+    <!-- Card Wrapper for Table -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <table class="table table-hover table-striped mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col" style="width: 10%;">Sl No</th>
+                        <th scope="col">Name</th>
+                        <th scope="col" style="width: 25%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pm in pms %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ pm.name }}</td>
+                        <td>
+                            <a href="{% url 'pm_edit' pm.pk %}" class="btn btn-sm btn-outline-primary me-1">
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </a>
+                            <a href="{% url 'pm_delete' pm.pk %}" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-3">
+                            No product managers found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}

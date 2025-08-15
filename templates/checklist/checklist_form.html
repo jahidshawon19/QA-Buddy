@@ -1,107 +1,62 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>{% if object %}Edit{% else %}Add{% endif %} Checklist</h2>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white text-center fw-bold">
+                    {% if object %}Edit{% else %}Add{% endif %} Checklist
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
 
-<form method="post" novalidate>
-  {% csrf_token %}
-  
-  {% if form.non_field_errors %}
-    <div class="alert alert-danger">
-      {{ form.non_field_errors }}
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+
+                        <!-- Loop through fields for consistent styling -->
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label fw-semibold">
+                                {{ field.label }}
+                                {% if field.field.required %}
+                                    <span class="text-danger">*</span>
+                                {% endif %}
+                            </label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+
+                        <!-- Sprint display for edit -->
+                        {% if object %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Sprint (auto-filled)</label>
+                            <input type="text" class="form-control" value="{{ object.sprint }}" readonly>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="submit" class="btn btn-success me-2">
+                                Save
+                            </button>
+                            <a href="{% url 'checklist_list' %}" class="btn btn-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-  {% endif %}
-
-
-  
-  <div class="mb-3">
-    <label for="{{ form.task.id_for_label }}" class="form-label">Task</label>
-    {{ form.task }}
-    {% if form.task.errors %}
-      <div class="text-danger">{{ form.task.errors }}</div>
-    {% endif %}
-  </div>
-
-  <div class="mb-3">
-    <label for="{{ form.test_area.id_for_label }}" class="form-label">Test Area</label>
-    {{ form.test_area }}
-    {% if form.test_area.errors %}
-      <div class="text-danger">{{ form.test_area.errors }}</div>
-    {% endif %}
-  </div>
-
-  <div class="mb-3">
-    <label for="{{ form.test_scenario.id_for_label }}" class="form-label">Test Scenario</label>
-    {{ form.test_scenario }}
-    {% if form.test_scenario.errors %}
-      <div class="text-danger">{{ form.test_scenario.errors }}</div>
-    {% endif %}
-  </div>
-
-  <div class="mb-3">
-    <label for="{{ form.approved_by_PM.id_for_label }}" class="form-label">Approved by Product Manager</label>
-    {{ form.approved_by_PM }}
-    {% if form.approved_by_PM.errors %}
-      <div class="text-danger">{{ form.approved_by_PM.errors }}</div>
-    {% endif %}
-  </div>
-
-  <div class="mb-3">
-    <label for="{{ form.approved_by_dev.id_for_label }}" class="form-label">Approved by Developer</label>
-    {{ form.approved_by_dev }}
-    {% if form.approved_by_dev.errors %}
-      <div class="text-danger">{{ form.approved_by_dev.errors }}</div>
-    {% endif %}
-  </div>
-
-  <div class="mb-3">
-    <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
-    {{ form.status }}
-    {% if form.status.errors %}
-      <div class="text-danger">{{ form.status.errors }}</div>
-    {% endif %}
-  </div>
-
-  <div class="mb-3">
-    <label for="{{ form.retest_status.id_for_label }}" class="form-label">Retest Status</label>
-    {{ form.retest_status }}
-    {% if form.retest_status.errors %}
-      <div class="text-danger">{{ form.retest_status.errors }}</div>
-    {% endif %}
-  </div>
-
-  <div class="mb-3">
-    <label for="{{ form.actual_evidence.id_for_label }}" class="form-label">Actual Evidence (URL)</label>
-    {{ form.actual_evidence }}
-    {% if form.actual_evidence.errors %}
-      <div class="text-danger">{{ form.actual_evidence.errors }}</div>
-    {% endif %}
-  </div>
-
-  <div class="mb-3">
-    <label for="{{ form.bug_link.id_for_label }}" class="form-label">Bug Link (URL)</label>
-    {{ form.bug_link }}
-    {% if form.bug_link.errors %}
-      <div class="text-danger">{{ form.bug_link.errors }}</div>
-    {% endif %}
-  </div>
-
-  <div class="mb-3">
-    <label for="{{ form.remarks.id_for_label }}" class="form-label">Remarks</label>
-    {{ form.remarks }}
-    {% if form.remarks.errors %}
-      <div class="text-danger">{{ form.remarks.errors }}</div>
-    {% endif %}
-  </div>
-
-  {% if object %}
-  <div class="mb-3">
-    <label class="form-label">Sprint (auto-filled)</label>
-    <input class="form-control" type="text" value="{{ object.sprint }}" readonly>
-  </div>
-  {% endif %}
-
-  <button type="submit" class="btn btn-success">Save</button>
-  <a href="{% url 'checklist_list' %}" class="btn btn-secondary ms-2">Cancel</a>
-</form>
+</div>
 {% endblock %}
